@@ -20,7 +20,7 @@ import static ruchkin.igor.translator.MainActivity.lang;
 import static ruchkin.igor.translator.MainActivity.trans;
 import static ruchkin.igor.translator.MainActivity.words;
 
-public class History extends AppCompatActivity {
+public class HistoryFile extends AppCompatActivity {
 
     public static String LOG_TAG = "my_log";
     final String FILENAME = "file";
@@ -34,8 +34,8 @@ public class History extends AppCompatActivity {
         setContentView(R.layout.activity_history);
 
         readFile();
-        // создаем адаптер
 
+        // создаем адаптер
         favAdapter = new FavAdapter(this, items);
 
         // настраиваем список

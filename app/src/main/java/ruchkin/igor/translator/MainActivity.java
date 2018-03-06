@@ -1,9 +1,12 @@
 package ruchkin.igor.translator;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -55,6 +58,7 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
     SharedPreferences sPref;
     final String SAVED_TEXT = "saved_text";
 
+    DBHelper dbHelper;
 
     /** Called when the activity is first created. */
     @Override
@@ -72,7 +76,8 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
             link=(TextView) findViewById(R.id.link);
             history=(Button)findViewById(R.id.history);
             favorites=(Button)findViewById(R.id.favorites);
-        // присвоим обработчик
+
+            // присвоим обработчик
             swap.setOnClickListener(this);
             lang1.setOnClickListener(this);
             lang2.setOnClickListener(this);
@@ -82,10 +87,11 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
             lang1.setText(lg1);
             lang2.setText(lg2);
 
-            //editText.setOnClickListener(this);
             editText.setOnEditorActionListener(this);
 
             loadText();
+            // создаем объект для создания и управления версиями БД
+            dbHelper = new DBHelper(this);
 
         String yand_link="Переведено сервисом «Яндекс.Переводчик»"+"<br><a href=\"http://translate.yandex.ru/\">translate.yandex.ru</a>";
         link.setText(Html.fromHtml(yand_link));
@@ -107,7 +113,7 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
         super.onResume();
         //loadText();
     }
-
+    @Override
     protected void onRestart() {
         super.onRestart();
         Log.d(LOG_TAG, "onRestart");
@@ -127,8 +133,8 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
         sPref = getPreferences(MODE_PRIVATE);
         Editor ed = sPref.edit();
         ed.putString(SAVED_TEXT, editText.getText().toString());
-
         ed.commit();
+        //writeDB();
       //  Toast.makeText(this, "Text saved", Toast.LENGTH_SHORT).show();
     }
 
@@ -142,13 +148,14 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
 
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
+
             // обрабатываем нажатие кнопки enter
             new ParseTranslator().execute();
             new ParseDictionatry().execute();
 
             words = editText.getText().toString();
-            //trans=tText.getText().toString();
 
+            writeDB();
 
             return true;
         }
@@ -162,7 +169,6 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
         new ParseTranslator().execute();
         new ParseLanguage().execute();
         new ParseDictionatry().execute();
-
 
 
         switch (v.getId()) {
@@ -209,9 +215,9 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
                 }
                     break;
             case R.id.history:
-                History.fillData();
+                //HistorySQL.fillData();
                 // передаем данные на другое активити
-                Intent intent3 = new Intent(this, History.class);
+                Intent intent3 = new Intent(this, HistorySQL.class);
                 startActivity(intent3);
                 break;
 
@@ -267,6 +273,23 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
                 else {
                     return true;
                 }
+    }
+
+    public void writeDB() {
+        // создаем объект для данных
+        ContentValues cv = new ContentValues();
+        // подключаемся к БД
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Log.d(LOG_TAG, "--- Insert in Htable: ---");
+        // подготовим данные для вставки в виде пар: наименование столбца - значение
+
+        cv.put("word", words);
+        cv.put("trans", trans);
+        cv.put("lang", lang);
+        // вставляем запись и получаем ее ID
+        long rowID = db.insert("Htable", null, cv);
+        Log.d(LOG_TAG, "row inserted, ID = " + rowID);
     }
 
 public class ParseTranslator extends AsyncTask<Void, Void, String> {
@@ -545,4 +568,6 @@ public class ParseDictionatry extends AsyncTask<Void, Void, String> {
             }
         }
     }
+
+
    }

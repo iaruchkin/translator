@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".LanguageActivity" />
-        <activity android:name=".History" />
+        <activity android:name=".HistoryFile" />
+        <activity android:name=".HistorySQL" />
         <activity android:name=".Favorites"></activity>
     </application>
 
