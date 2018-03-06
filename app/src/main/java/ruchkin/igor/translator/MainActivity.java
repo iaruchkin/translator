@@ -36,6 +36,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import static ruchkin.igor.translator.DBService.*;
+
 
 public class MainActivity extends LanguageActivity implements OnClickListener, OnEditorActionListener {
 
@@ -57,8 +59,6 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
 
     SharedPreferences sPref;
     final String SAVED_TEXT = "saved_text";
-
-    DBHelper dbHelper;
 
     /** Called when the activity is first created. */
     @Override
@@ -90,11 +90,12 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
             editText.setOnEditorActionListener(this);
 
             loadText();
+
             // создаем объект для создания и управления версиями БД
             dbHelper = new DBHelper(this);
 
-        String yand_link="Переведено сервисом «Яндекс.Переводчик»"+"<br><a href=\"http://translate.yandex.ru/\">translate.yandex.ru</a>";
-        link.setText(Html.fromHtml(yand_link));
+            String yand_link="Переведено сервисом «Яндекс.Переводчик»"+"<br><a href=\"http://translate.yandex.ru/\">translate.yandex.ru</a>";
+            link.setText(Html.fromHtml(yand_link));
 
         }
 
@@ -152,10 +153,8 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
             // обрабатываем нажатие кнопки enter
             new ParseTranslator().execute();
             new ParseDictionatry().execute();
-
-            words = editText.getText().toString();
-
             writeDB();
+            words = editText.getText().toString();
 
             return true;
         }
@@ -273,23 +272,6 @@ public class MainActivity extends LanguageActivity implements OnClickListener, O
                 else {
                     return true;
                 }
-    }
-
-    public void writeDB() {
-        // создаем объект для данных
-        ContentValues cv = new ContentValues();
-        // подключаемся к БД
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        Log.d(LOG_TAG, "--- Insert in Htable: ---");
-        // подготовим данные для вставки в виде пар: наименование столбца - значение
-
-        cv.put("word", words);
-        cv.put("trans", trans);
-        cv.put("lang", lang);
-        // вставляем запись и получаем ее ID
-        long rowID = db.insert("Htable", null, cv);
-        Log.d(LOG_TAG, "row inserted, ID = " + rowID);
     }
 
 public class ParseTranslator extends AsyncTask<Void, Void, String> {

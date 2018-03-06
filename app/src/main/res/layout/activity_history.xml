@@ -76,22 +76,24 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="28dp"
         android:text="Избранное"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/clean"
         app:layout_constraintHorizontal_bias="0.545"
         app:layout_constraintLeft_toRightOf="@+id/history"
         app:layout_constraintRight_toLeftOf="@+id/settings" />
 
     <Button
-        android:id="@+id/settings"
+        android:id="@+id/clean"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="100dp"
         android:layout_height="60dp"
         android:layout_marginBottom="0dp"
         android:layout_marginRight="8dp"
-        android:text="Настройки"
+        android:text="Очистка"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
